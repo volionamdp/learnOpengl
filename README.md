@@ -24,8 +24,11 @@ và các dữ liệu lập trình cơ bản (float,int,...)
 (từ đang trước kiểu dữ liệu vd:trong java static,const ...)
 
 const: (chỉ đọc) thuộc tính biến hằng số
+
 attribute: chỉ có thể được sử dụng trong bộ đổ bóng đỉnh, cho thông tin thường xuyên thay đổi
+
 uniform: (Nhất quán) đối với thông tin thay đổi không thường xuyên, có thể được sử dụng trong các trình tạo bóng đỉnh và phân mảnh (cái này có thể set liên tục trong code c,java,kotlin... được dùng chính để thay đổi giá trị của shader)
+
 varying: (biến) được sử dụng để sửa đổi biến được truyền từ bộ đổ bóng đỉnh(Vertex Shader) sang bộ đổ bóng phân đoạn(Fragment Shader).
 
 ## 3. Biến tích hợp (biến mặc định trong shader)
@@ -36,7 +39,9 @@ Fragment Các biến tích hợp của Vertex Shader: gl_FragColor (trả về m
 
 ## 4. Các hàm,chức năng có sẵn hay dùng
 in: chế độ mặc định, cách truyền giá trị, không thể sửa đổi
+
 inout: truyền theo tham chiếu, được phép sửa đổi, sau khi sửa đổi, hàm sẽ thay đổi sau khi thoát
+
 out:  sẽ được sửa đổi khi hàm trả về
 
 vd: 
