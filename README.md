@@ -10,21 +10,13 @@ Dưới đây là mô tả về kích thước lưu chữ
 
 Trong đồ họa máy tính, vectơ và ma trận là cơ sở của phép biến đổi, và hai kiểu dữ liệu này cũng là trung tâm của GLSL
 
-
 vec2, vec3, vec4: vectơ dấu phẩy động (float) : vec2 tương ứng với vector 2 chiều,vec3 là vector 3 chiều .. vd: vec2(2.,1.) ,vec3(1.,2.,3.)
-
 ivec2, ivec3, ivec4: vectơ số nguyên (int)
-
 uvec2, uvec3, uvec4: vectơ số nguyên dương
-
 bvec2, bvec3, bvec4: vectơ boolean (bool)
-
 mat2, mat3, mat4, mat2x3 ...: ma trận dấu chấm động
 
-
-
 sampler2D: kết cấu 2d (để dẽ hiểu có thể coi là ảnh 2d)
-
 
 và các dữ liệu lập trình cơ bản (float,int,...)
 
@@ -55,11 +47,19 @@ void test(in float a,out float b){
 ```
     
 abs: giá trị tuyệt đối
+
 floor: làm tròn xuống
+
 ceil: làm tròn lên
+
 mod: modulo  (trong này không dùng được kiêu a%b nên phải dùng hàm này)
+
 min: tối thiểu
+
 max: tối đa
+
 clamp:clamp(x,minVal,maxVal) tương đương  min(max(x, minVal), maxVal).
+
 pow: tính lũy thừa
+
 mix: mix(x,y,a) =  x×(1−a)+y×a .
