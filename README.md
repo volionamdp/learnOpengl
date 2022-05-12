@@ -72,3 +72,5 @@ clamp:clamp(x,minVal,maxVal) tương đương  min(max(x, minVal), maxVal).
 pow: tính lũy thừa
 
 mix: mix(x,y,a) =  x×(1−a)+y×a .
+
+distance: tính khoảng cách giữa 2 điểm
