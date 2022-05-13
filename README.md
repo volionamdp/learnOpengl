@@ -1,7 +1,7 @@
 # 
 ## 1. Kích thước lưu trữ dữ liệu
 Dưới đây là mô tả về kích thước lưu chữ
-được sử dụng để sửa đổi dấu chấm động và định hình, có ba mức highp \ mediump, lowp
+được sử dụng để lưu trữ dữ liệu, có ba mức highp \ mediump, lowp
 
 ![N|Solid](https://raw.githubusercontent.com/volionamdp/learnOpengl/master/image/640.jpg)
 
