@@ -5,6 +5,12 @@ Dưới đây là mô tả về kích thước lưu chữ
 
 ![N|Solid](https://raw.githubusercontent.com/volionamdp/learnOpengl/master/image/640.jpg)
 
+lowp Giá trị float có thể được lưu trữ bằng cách sử dụng 10 bit, mediump giá trị float có thể được lưu trữ bằng 16 bit và highpgiá trị float có thể được lưu trữ bằng  32 bit. Tuy nhiên, kết quả đầu ra phụ thuộc vào GPU bên dưới.
+
+GPU Mali không phân biệt giữa lowp và mediump . Điều này có nghĩa là cả hai đều được ánh xạ tới kiểu dữ liệu 16 bit và highp các biến được ánh xạ tới kiểu dữ liệu 32 bit.
+
+Lưu ý: Các GPU dòng Mali-400 cũ hơn, dựa trên kiến ​​trúc Utgard, không hỗ trợ highp xử lý trong trình tạo bóng phân mảnh. Do đó, tất cả các biến sẽ được xử lý ở các biến 16 bit khi sử dụng GPU dòng Mali-400.
+
 
 ## 2. Các loại dữ liệu cơ bản
 
