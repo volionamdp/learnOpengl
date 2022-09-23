@@ -10,48 +10,53 @@ import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 private const val TAG = "MyRender"
-class MyRender : GLSurfaceView.Renderer {
+
+class MyRender2 : GLSurfaceView.Renderer {
     private val vertexData = floatArrayOf(
-        -0.8f, -0.8f,
-        -0.8f, 0.8f,
-        0.8f, 0.8f,
-        -0.8f, -0.8f,
-        0.8f, 0.8f,
-        0.8f, -0.8f
+        -0.8f, -0.8f, 1f, 0f, 0f,
+        -0.8f, 0.8f, 0f, 1f, 0f,
+        0.8f, -0.8f, 1f, 0f, 1f,
+        0.8f, 0.8f, 0f, 0f, 1f,
     )
 
-    val vertexShader = """attribute vec4 a_Position;     
-                           void main()                    
-                           {                              
-                              gl_Position = a_Position;   
-                           }                              
+    val vertexShader = """attribute vec4 a_Position;
+                           attribute vec3 a_color;
+                           varying mediump vec3 color;
+                           void main()
+                           {
+                              gl_Position = a_Position;
+                              color = a_color;
+                           }
                            """
 
-
-    val fragmentShader = """precision mediump float;       
-                            void main()                    
-                            {                              
-                               gl_FragColor = vec4(1.,0.,0.,1.);     
-                            }                              
+    val fragmentShader = """precision mediump float;
+                            varying mediump vec3 color;
+                            void main()
+                            {
+                               gl_FragColor = vec4(color,1.);
+                            }
                             """
+
     private var triangleVertices: FloatBuffer
     private val FLOAT_BYTE_SIZE = 4
-    private var program:Int = 0
-    private var aPosition:Int = 0;
+    private var program: Int = 0
+    private var aPosition: Int = 0;
+    private var aColor: Int = 0;
 
     init {
         // Initialize the buffers.
         /// "allocateDirect" dùng bộ nhớ trực tiếp (trên os) thay vì dùng gián tiếp trên bộ nhớ máy ảo như "allocate"
         triangleVertices = ByteBuffer.allocateDirect(vertexData.size * FLOAT_BYTE_SIZE)
             //cách thức đọc ghi bộ nhớ ByteOrder.BIG_ENDIAN thứ tự a->z || ByteOrder.LITTLE_ENDIAN ngược lại z->a
-            .order(ByteOrder.nativeOrder()
-        ).asFloatBuffer()
+            .order(
+                ByteOrder.nativeOrder()
+            ).asFloatBuffer()
         triangleVertices.put(vertexData)?.position(0)
     }
 
     // type ở đây gồm 2 loại là GLES20.GL_VERTEX_SHADER và GLES20.GL_FRAGMENT_SHADER tương ứng với
     // vertex shader và fragment shader trong biểu đồ, codeStr là mã code shader hướng dẫn ở bài đầu
-    private  fun loadShader(type: Int, codeStr: String): Int {
+    private fun loadShader(type: Int, codeStr: String): Int {
         //Tạo một shader mới theo type và trả về liên kết với shader
         val shader = GLES20.glCreateShader(type)
         if (shader > 0) {
@@ -90,22 +95,42 @@ class MyRender : GLSurfaceView.Renderer {
         GLES20.glUseProgram(programId)
         return programId
     }
+
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        program = loadProgram(vertexShader,fragmentShader)
-        aPosition = GLES20.glGetAttribLocation(program,"a_Position")
+        program = loadProgram(vertexShader, fragmentShader)
+        aPosition = GLES20.glGetAttribLocation(program, "a_Position")
+        aColor = GLES20.glGetAttribLocation(program, "a_color")
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
-        GLES20.glViewport(0,0,width,height)
+        GLES20.glViewport(0, 0, width, height)
     }
 
     override fun onDrawFrame(gl: GL10?) {
-        GLES20.glClearColor(0f,0f,0f,0f)
+        GLES20.glClearColor(0f, 0f, 0f, 0f)
         triangleVertices.position(0)
 
         GLES20.glEnableVertexAttribArray(aPosition)
-        GLES20.glVertexAttribPointer(aPosition,2,GLES20.GL_FLOAT,false,2*FLOAT_BYTE_SIZE,triangleVertices)
+        GLES20.glVertexAttribPointer(
+            aPosition,
+            2,
+            GLES20.GL_FLOAT,
+            false,
+            5 * FLOAT_BYTE_SIZE,
+            triangleVertices
+        )
 
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES,0,6)
+        triangleVertices.position(2)
+        GLES20.glEnableVertexAttribArray(aColor)
+        GLES20.glVertexAttribPointer(
+            aColor,
+            3,
+            GLES20.GL_FLOAT,
+            false,
+            5 * FLOAT_BYTE_SIZE,
+            triangleVertices
+        )
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
+
     }
 }
