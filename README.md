@@ -1,82 +1,68 @@
-# 
-## 1. Kích thước lưu trữ dữ liệu
-Dưới đây là mô tả về kích thước lưu chữ
-được sử dụng để lưu trữ dữ liệu và độ chính xác dữ liệu(float), có ba mức highp \ mediump, lowp
+## 1. Setup shader
+Dưới đây là biểu đồ các bước cơ bản để setup shader
+được sử dụng để sửa đổi dấu chấm động và định hình, có ba mức highp \ mediump, lowp
 
-![N|Solid](https://raw.githubusercontent.com/volionamdp/learnOpengl/master/image/640.jpg)
-
-lowp Giá trị float có thể được lưu trữ bằng cách sử dụng 10 bit, mediump giá trị float có thể được lưu trữ bằng 16 bit và highpgiá trị float có thể được lưu trữ bằng  32 bit. Tuy nhiên, kết quả đầu ra phụ thuộc vào GPU bên dưới.
-
-GPU Mali không phân biệt giữa lowp và mediump . Điều này có nghĩa là cả hai đều được ánh xạ tới kiểu dữ liệu 16 bit và highp các biến được ánh xạ tới kiểu dữ liệu 32 bit.
-
-Lưu ý: Các GPU dòng Mali-400 cũ hơn, dựa trên kiến ​​trúc Utgard, không hỗ trợ highp xử lý trong trình tạo bóng phân mảnh. Do đó, tất cả các biến sẽ được xử lý ở các biến 16 bit khi sử dụng GPU dòng Mali-400.
+![N|Solid](https://raw.githubusercontent.com/volionamdp/learnOpengl/setup/image/setup_shader.jpg)
 
 
-## 2. Các loại dữ liệu cơ bản
-
-Trong đồ họa máy tính, vectơ và ma trận là cơ sở của phép biến đổi, và hai kiểu dữ liệu này cũng là trung tâm của GLSL
-
-vec2, vec3, vec4: vectơ dấu phẩy động (float) : vec2 tương ứng với vector 2 chiều,vec3 là vector 3 chiều .. vd: vec2(2.,1.) ,vec3(1.,2.,3.)
-
-ivec2, ivec3, ivec4: vectơ số nguyên (int)
-
-uvec2, uvec3, uvec4: vectơ số nguyên dương
-
-bvec2, bvec3, bvec4: vectơ boolean (bool)
-
-mat2, mat3, mat4, mat2x3 ...: ma trận dấu chấm động
-
-sampler2D: kết cấu 2d (để dẽ hiểu có thể coi là ảnh 2d)
-
-và các dữ liệu lập trình cơ bản (float,int,...)
-
-## 3. Bổ ngữ (chưa biết gọi là gì)
-(từ đang trước kiểu dữ liệu vd:trong java static,const ...)
-
-const: (chỉ đọc) thuộc tính biến hằng số
-
-attribute: chỉ có thể được sử dụng trong bộ đổ bóng đỉnh, cho thông tin thường xuyên thay đổi
-
-uniform: (Nhất quán) đối với thông tin thay đổi không thường xuyên, có thể được sử dụng trong các trình tạo bóng đỉnh và phân mảnh (cái này có thể set liên tục trong code c,java,kotlin... được dùng chính để thay đổi giá trị của shader)
-
-varying: (biến) được sử dụng để sửa đổi biến được truyền từ bộ đổ bóng đỉnh(Vertex Shader) sang bộ đổ bóng phân đoạn(Fragment Shader).
-
-## 3. Biến tích hợp (biến mặc định trong shader)
-Phổ biến nhất là các biến đầu ra của bộ đổ bóng đỉnh và bộ tạo bóng phân đoạn
-
-Các biến tích hợp của Vertex Shader: gl_position và gl_pointSize (trả về tọa độ điểm và kích thước điểm)
-Fragment Các biến tích hợp của Vertex Shader: gl_FragColor (trả về màu sắc (r,g,b,a) sau sử lí )
-
-## 4. Các hàm,chức năng có sẵn hay dùng
-in: chế độ mặc định, cách truyền giá trị, không thể sửa đổi
-
-inout: truyền theo tham chiếu, được phép sửa đổi, sau khi sửa đổi, hàm sẽ thay đổi sau khi thoát
-
-out:  sẽ được sửa đổi khi hàm trả về
-
-vd: 
-```c
-void test(in float a,out float b){
-    b = a*2.;
-}
+## 2. Triển khai tạo liên kết shader
+- Cơ bản nhất
+```java
+// type ở đây gồm 2 loại là GLES20.GL_VERTEX_SHADER và GLES20.GL_FRAGMENT_SHADER tương ứng với  vertex shader và fragment shader trong biểu đồ, codeStr là mã code shader hướng dẫn ở bài đầu
+private static int loadShader(int type, String codeStr) {
+        //Tạo một shader mới theo type và trả về liên kết với shader
+        int shader = GLES20.glCreateShader(type);
+        if (shader > 0) {
+            // Set codeStr vào vào shader đã được tạo
+            GLES20.glShaderSource(shader, codeStr);
+            //Biên dịch bộ đổ bóng
+            GLES20.glCompileShader(shader);
+        }
+        return shader;
+    }
 ```
-    
-abs: giá trị tuyệt đối
+- Thêm bước kiểm tra lỗi
+```java
+private static int loadShader(int type, String codeStr) {
+        //Tạo một shader mới theo type và trả về liên kết với shader
+        int shader = GLES20.glCreateShader(type);
+        if (shader > 0) {
+            // Set codeStr vào vào shader đã được tạo
+            GLES20.glShaderSource(shader, codeStr);
+            //Biên dịch bộ đổ bóng
+            GLES20.glCompileShader(shader);
 
-floor: làm tròn xuống
+        
+            // kiểm tra lỗi
+            int[] status = new int[1];
+            GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, status, 0);
+            Log.i(TAG, "loadShader: status[0]=" + status[0]);
+            if (status[0] == 0) {
+                //loại bỏ shader 
+                GLES20.glDeleteShader(shader);
+                return 0;
+            }
+        }
+        return shader;
+    }
+```
 
-ceil: làm tròn lên
-
-mod: modulo  (trong này không dùng được kiêu a%b nên phải dùng hàm này)
-
-min: tối thiểu
-
-max: tối đa
-
-clamp:clamp(x,minVal,maxVal) tương đương  min(max(x, minVal), maxVal).
-
-pow: tính lũy thừa
-
-mix: mix(x,y,a) =  x×(1−a)+y×a .
-
-distance: tính khoảng cách giữa 2 điểm
+## 3. Triển khai hoàn chỉnh
+```java
+public static int loadProgram(String verCode, String fragmentCode) {
+        //1. Tạo một chương trình xử lý Shader và trả liên kết chương trình
+        int programId = GLES20.glCreateProgram();
+        if(programId == 0){
+            Log.e(TAG, "loadProgram: glCreateProgram error" );
+            return 0;
+        }
+        //2. Đính kèm shader vào chương trình
+        GLES20.glAttachShader(programId, loadShader(GLES20.GL_VERTEX_SHADER, verCode));
+        GLES20.glAttachShader(programId, loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentCode));
+        //3. Liên kết
+        GLES20.glLinkProgram(programId);
+        //4. Sử dụng
+        GLES20.glUseProgram(programId);
+        return programId;
+    }
+```
