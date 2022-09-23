@@ -40,8 +40,11 @@ class MyRender : GLSurfaceView.Renderer {
     private var aPosition:Int = 0;
 
     init {
-        triangleVertices = ByteBuffer.allocateDirect(vertexData.size * FLOAT_BYTE_SIZE).order(
-            ByteOrder.nativeOrder()
+        // Initialize the buffers.
+        /// "allocateDirect" dùng bộ nhớ trực tiếp (trên os) thay vì dùng gián tiếp trên bộ nhớ máy ảo như "allocate"
+        triangleVertices = ByteBuffer.allocateDirect(vertexData.size * FLOAT_BYTE_SIZE)
+            //cách thức đọc ghi bộ nhớ ByteOrder.BIG_ENDIAN thứ tự a->z || ByteOrder.LITTLE_ENDIAN ngược lại z->a
+            .order(ByteOrder.nativeOrder()
         ).asFloatBuffer()
         triangleVertices.put(vertexData)?.position(0)
     }
