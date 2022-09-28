@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("zzet", "onCreate: ${glSurfaceView==null}")
         if (glSurfaceView != null) {
             glSurfaceView.setEGLContextClientVersion(2)
-            glSurfaceView.setRenderer(MyRender2())
+            glSurfaceView.setRenderer(MyRender3())
             glSurfaceView.renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
         }
     }
