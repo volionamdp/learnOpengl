@@ -11,7 +11,7 @@ import javax.microedition.khronos.opengles.GL10
 
 private const val TAG = "MyRender"
 
-class MyRender2 : GLSurfaceView.Renderer {
+class MyRenderColor : GLSurfaceView.Renderer {
     private val vertexData = floatArrayOf(
         -0.8f, -0.8f, 1f, 0f, 0f,
         -0.8f, 0.8f, 0f, 1f, 0f,

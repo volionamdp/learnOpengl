@@ -13,7 +13,7 @@ import javax.microedition.khronos.opengles.GL10
 
 private const val TAG = "MyRender"
 
-class MyRender3 : GLSurfaceView.Renderer {
+class MyRenderMatrix : GLSurfaceView.Renderer {
     private val vertexData = floatArrayOf(
         -0.5f, -0.5f, 1f, 0f, 0f,
         -0.5f, 0.5f, 0f, 1f, 0f,
