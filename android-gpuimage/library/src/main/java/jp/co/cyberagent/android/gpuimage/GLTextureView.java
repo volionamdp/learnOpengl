@@ -167,7 +167,7 @@ public class GLTextureView extends TextureView
      * resumed.
      * <p>
      * If set to true, then the EGL context may be preserved when the GLTextureView is paused.
-     * Whether the EGL context is actually preserved or not depends upon whether the
+     * Whether the EGL context is ly preserved or not depends upon whether the
      * Android device that the program is running on can support an arbitrary number of EGL
      * contexts or not. Devices that can only support a limited number of EGL contexts must
      * release the  EGL context in order to allow multiple applications to share the GPU.
@@ -1115,7 +1115,7 @@ public class GLTextureView extends TextureView
 
     /**
      * A generic GL Thread. Takes care of initializing EGL and GL. Delegates
-     * to a Renderer instance to do the actual drawing. Can be configured to
+     * to a Renderer instance to do the  drawing. Can be configured to
      * render continuously or on request.
      * <p>
      * All potentially blocking synchronization is done through the

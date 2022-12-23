@@ -3,11 +3,19 @@ package com.volio.basicopengles
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.opengl.*
 import android.util.Log
+import org.jetbrains.skia.*
+import org.jetbrains.skia.paragraph.FontCollection
+import org.jetbrains.skia.paragraph.ParagraphBuilder
+import org.jetbrains.skia.paragraph.ParagraphStyle
+import org.jetbrains.skia.paragraph.TextStyle
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
+import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -15,20 +23,21 @@ private const val TAG = "MyRender"
 
 class MyRenderMatrixTexture(val context: Context) : GLSurfaceView.Renderer {
     private val vertexData = floatArrayOf(
-        -0.5f, -0.5f, 0f, 1f,
-        -0.5f, 0.5f, 0f, 0f,
-        0.5f, -0.5f, 1f, 1f,
-        0.5f, 0.5f, 1f, 0f,
+        -1f, -1f, 0f, 1f,
+        -1f, 1f, 0f, 0f,
+        1f, -1f, 1f, 1f,
+        1f, 1f, 1f, 0f,
     )
 
     val vertexShader = """attribute vec4 a_Position;
                            attribute vec4 a_TextureCoordinate;
                            varying vec2 textureCoordinate;
-                           uniform mat4 u_MVPMatrix;      
+                           //uniform mat4 u_MVPMatrix;      
 
                            void main()
                            {
-                              gl_Position = u_MVPMatrix*a_Position;
+//                              gl_Position = u_MVPMatrix*a_Position;
+                              gl_Position = a_Position;
                               textureCoordinate = a_TextureCoordinate.xy;
                            }
                            """
@@ -56,6 +65,7 @@ class MyRenderMatrixTexture(val context: Context) : GLSurfaceView.Renderer {
     private var mvpMatrix: FloatArray = FloatArray(16)
     private var bitmap: Bitmap
     private var textureId: Int = NO_TEXTURE
+    private var framebufferObject = GlFramebufferObject()
 
     init {
         // Initialize the buffers.
@@ -149,13 +159,37 @@ class MyRenderMatrixTexture(val context: Context) : GLSurfaceView.Renderer {
         program = loadProgram(vertexShader, fragmentShader)
         aPosition = GLES20.glGetAttribLocation(program, "a_Position")
         aTextureCoordinate = GLES20.glGetAttribLocation(program, "a_TextureCoordinate")
-        uMvp = GLES20.glGetUniformLocation(program, "u_MVPMatrix")
+//        uMvp = GLES20.glGetUniformLocation(program, "u_MVPMatrix")
         Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 1.5f, 0f, 0f, 0f, 0f, 1f, 0f)
+
+
+            var time = System.nanoTime()
+//            val bitmap = Bitmap.createBitmap(2000, 2000, Bitmap.Config.HARDWARE)
+//            val canvas = Canvas(bitmap)
+//            draw(canvas)
+//            Log.d("Time", "onCreate: ${System.nanoTime()-time}")
+
+//            time = System.nanoTime()
+//            val bitmap2 = Bitmap.createBitmap(2000, 2000, Bitmap.Config.ARGB_8888)
+//        Log.d("Time2", "onCreate1: ${System.nanoTime()-time}")
+//        time = System.nanoTime()
+//
+//        val canvas2 = Canvas(bitmap2)
+//            draw(canvas2)
+            Log.d("Time2", "onCreate2: ${System.nanoTime()-time}")
     }
 
+    private var paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    val text = "ajdjghdjgldls ọtgjheijigtjojdsgjdsji"
+    private fun draw(canvas: Canvas){
+        canvas.drawCircle(1000f,1000f,500f,paint)
+        canvas.drawText(text,0,text.length,100f,100f,paint)
+
+    }
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
-
+        framebufferObject.setup(width, height)
+        initCanvas(gl!!,width, height)
         // Create a new perspective projection matrix. The height will stay the same
         // while the width will vary as per aspect ratio.
         val ratio = width.toFloat() / height
@@ -176,16 +210,43 @@ class MyRenderMatrixTexture(val context: Context) : GLSurfaceView.Renderer {
         Matrix.setIdentityM(modelMatrix, 0)
 //        Matrix.translateM(modelMatrix, 0, 0f, 0f, -2f)
 //        Matrix.rotateM(modelMatrix, 0, rotate % 360, 1f, 1f, 1f)
-
+        Matrix.scaleM(modelMatrix,0,1f,1f,1f)
         Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0)
         Matrix.multiplyMM(mvpMatrix, 0, projectMatrix, 0, mvpMatrix, 0)
     }
+    val textStyle = TextStyle().setColor(0xFFFFFFFF.toInt()).setFontSize(100f)
+    val input = ParagraphBuilder(
+        ParagraphStyle(), FontCollection()
+        .setDefaultFontManager(FontMgr.default))
+        .pushStyle(textStyle)
+        .addText("TextInput:")
+        .addText("gggae")
+        .popStyle()
+        .build()
+    val paint2 = org.jetbrains.skia.Paint()
+    private fun draw(){
+        canvas?.clear(Color.BLUE)
+        paint2.color = Color.RED
+        canvas?.drawCircle(500f, 500f, 500f,paint2)
+        input.paint(canvas,500f,500f)
+//        canvas?.drawRect(Rect.makeXYWH(100f,100f,300f,300f),paint2)
 
+        context2?.flush()
+        textureId = framebufferObject.texName
+
+    }
     override fun onDrawFrame(gl: GL10?) {
+
+//        framebufferObject.enable()
+
+        val time = System.currentTimeMillis()
+//        updateMatrix()
+//        draw()
+        GLES20.glUseProgram(program)
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0)
         if (textureId == NO_TEXTURE){
             textureId = loadTexture(bitmap,textureId,false)
         }
-        updateMatrix()
         GLES20.glClearColor(0f, 0f, 0f, 1f)
         GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT)
 
@@ -218,7 +279,7 @@ class MyRenderMatrixTexture(val context: Context) : GLSurfaceView.Renderer {
         GLES20.glUniform1i(aTextureCoordinate, 0)
 
 
-        GLES20.glUniformMatrix4fv(uMvp, 1, false, mvpMatrix, 0)
+       // GLES20.glUniformMatrix4fv(uMvp, 1, false, mvpMatrix, 0)
 
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
@@ -227,8 +288,39 @@ class MyRenderMatrixTexture(val context: Context) : GLSurfaceView.Renderer {
 
         GLES20.glDisableVertexAttribArray(aPosition)
         GLES20.glDisableVertexAttribArray(aTextureCoordinate)
+        Log.d(TAG, "onDrawFrame: ${System.currentTimeMillis() -time}")
+        draw()
 
     }
+    private fun initCanvas(gl: GL10, width: Int, height: Int) {
+        framebufferObject.enable()
+        val intBuf1 = IntBuffer.allocate(1)
+        gl.glGetIntegerv(GLES30.GL_DRAW_FRAMEBUFFER_BINDING, intBuf1)
+        val fbId = framebufferObject.framebufferName
+//        val fbId = intBuf1[0]
+        Log.d(TAG, "initCanvas: ${fbId}")
+
+        val renderTarget = BackendRenderTarget.makeGL(
+            width,
+            height,
+            0,
+            8,
+            fbId,
+            FramebufferFormat.GR_GL_RGBA8
+        )
+        context2 = DirectContext.makeGL()
+        val surface = Surface.makeFromBackendRenderTarget(
+            context2!!,
+            renderTarget,
+            SurfaceOrigin.BOTTOM_LEFT,
+            SurfaceColorFormat.RGBA_8888,
+            ColorSpace.sRGB
+        )
+        canvas = surface!!.canvas
+    }
+
+    var context2: DirectContext? = null
+    var canvas: org.jetbrains.skia.Canvas? = null
 
     companion object {
         const val NO_TEXTURE = -1
